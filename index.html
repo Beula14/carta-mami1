@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carta Día de la Madre</title>
+
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle, #5c1f2e, #1b0b12);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Georgia, serif;
+      overflow: hidden;
+    }
+
+    .contenedor {
+      width: 90%;
+      max-width: 420px;
+      height: 560px;
+      perspective: 1200px;
+      position: relative;
+    }
+
+    .sobre {
+      width: 100%;
+      height: 300px;
+      background: #d98b73;
+      position: absolute;
+      bottom: 80px;
+      border-radius: 15px;
+      box-shadow: 0 25px 50px rgba(0,0,0,.5);
+      transform-style: preserve-3d;
+      cursor: pointer;
+      transition: transform 1s;
+      z-index: 3;
+    }
+
+    .sobre::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-left: 210px solid transparent;
+      border-right: 210px solid transparent;
+      border-top: 150px solid #c96f61;
+      transform-origin: top;
+      transition: transform 1s;
+      z-index: 4;
+    }
+
+    .sobre.abierto::before {
+      transform: rotateX(180deg);
+    }
+
+    .sobre.abierto {
+      transform: translateY(80px) rotateX(10deg);
+    }
+
+    .texto-sobre {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      top: 130px;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      z-index: 5;
+    }
+
+    .carta {
+      width: 90%;
+      height: 430px;
+      background: #fff4e8;
+      border-radius: 20px;
+      position: absolute;
+      left: 5%;
+      bottom: 100px;
+      box-shadow: 0 25px 50px rgba(0,0,0,.4);
+      transform: translateY(180px) scale(.7) rotateX(70deg);
+      opacity: 0;
+      transition: all 1s;
+      z-index: 1;
+      padding: 25px;
+      box-sizing: border-box;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .carta.mostrar {
+      transform: translateY(-60px) scale(1) rotateX(0deg);
+      opacity: 1;
+      z-index: 6;
+    }
+
+    .foto {
+      width: 115px;
+      height: 115px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 5px solid #e49b87;
+      margin-bottom: 10px;
+    }
+
+    h1, h2 {
+      color: #b93d5a;
+    }
+
+    p, li {
+      color: #5c2b2b;
+      font-size: 18px;
+      line-height: 1.5;
+    }
+
+    ul {
+      text-align: left;
+    }
+
+    .corazon {
+      font-size: 80px;
+      animation: latir .8s infinite alternate;
+    }
+
+    @keyframes latir {
+      from { transform: scale(1); }
+      to { transform: scale(1.25); }
+    }
+
+    .botones {
+      position: fixed;
+      bottom: 25px;
+      display: flex;
+      gap: 12px;
+      z-index: 20;
+    }
+
+    button {
+      border: none;
+      padding: 12px 18px;
+      border-radius: 25px;
+      background: #ff6f91;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(0,0,0,.3);
+    }
+
+    .instruccion {
+      position: fixed;
+      top: 20px;
+      color: white;
+      background: rgba(0,0,0,.4);
+      padding: 10px 18px;
+      border-radius: 20px;
+      font-size: 15px;
+      text-align: center;
+      z-index: 30;
+    }
+
+    @media (max-width: 480px) {
+      .contenedor {
+        max-width: 340px;
+        height: 520px;
+      }
+
+      .sobre::before {
+        border-left-width: 170px;
+        border-right-width: 170px;
+      }
+
+      p, li {
+        font-size: 16px;
+      }
+
+      h1 {
+        font-size: 27px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="instruccion">
+    Toca el sobre para abrir 💌 <br>
+    1 toque para avanzar | 2 toques para regresar
+  </div>
+
+  <div class="contenedor">
+    <div class="sobre" id="sobre">
+      <div class="texto-sobre">💌 Toca el sobre</div>
+    </div>
+
+    <div class="carta" id="carta"></div>
+  </div>
+
+  <div class="botones">
+    <button onclick="reiniciarCarta()">🔄 Ver otra vez</button>
+  </div>
+
+  <script>
+    const sobre = document.getElementById("sobre");
+    const carta = document.getElementById("carta");
+
+    let abierta = false;
+    let pagina = 0;
+    let ultimoTap = 0;
+
+    const fotoMama = "WhatsApp Image 2026-05-07 at 11.08.32 PM.jpg";
+
+    const paginas = [
+      `
+        <img class="foto" src="${fotoMama}" alt="Mamá">
+        <h1>🌹 Feliz Día, Mami 🌹</h1>
+        <p>Para la mujer más especial del mundo.</p>
+        <p>Gracias por tu amor, tu paciencia y tus abrazos.</p>
+      `,
+      `
+        <h2>💌 Mensaje para ti</h2>
+        <p>
+          Mami, tu amor es mi refugio,<br>
+          tus abrazos mi canción.<br>
+          Cada día agradezco a Dios<br>
+          por tener la bendicion que seas mi mamá.
+        </p>
+      `,
+      `
+        <h2>✦ Lo que más admiro de ti ✦</h2>
+        <ul>
+          <li>Tu fortaleza inquebrantable.</li>
+          <li>Tu sonrisa que ilumina todo.</li>
+          <li>Tu paciencia y sabiduría infinita.</li>
+          <li>Tu cocina llena de sabor y cariño.</li>
+          <li>La forma en que cuidas de todos.</li>
+        </ul>
+      `,
+      `
+        <div class="corazon">❤️</div>
+        <h2>Te amo infinitamente</h2>
+        <p>
+          Gracias por cada sacrificio, cada consejo
+          y cada momento lleno de amor.
+        </p>
+        <p><b>Con mucho cariño, Beu te desea Feliz dia de la Madre❤️</b></p>
+      `
+    ];
+
+    function mostrarPagina() {
+      carta.innerHTML = paginas[pagina];
+    }
+
+    sobre.addEventListener("click", () => {
+      if (!abierta) {
+        abierta = true;
+        sobre.classList.add("abierto");
+        carta.classList.add("mostrar");
+        mostrarPagina();
+      }
+    });
+
+    carta.addEventListener("click", () => {
+      const tiempoActual = new Date().getTime();
+      const diferencia = tiempoActual - ultimoTap;
+
+      if (diferencia < 300 && diferencia > 0) {
+        if (pagina > 0) {
+          pagina--;
+          mostrarPagina();
+        }
+        ultimoTap = 0;
+      } else {
+        ultimoTap = tiempoActual;
+
+        setTimeout(() => {
+          if (ultimoTap !== 0 && new Date().getTime() - ultimoTap >= 300) {
+            if (pagina < paginas.length - 1) {
+              pagina++;
+              mostrarPagina();
+            }
+            ultimoTap = 0;
+          }
+        }, 300);
+      }
+    });
+
+    function reiniciarCarta() {
+      abierta = false;
+      pagina = 0;
+      ultimoTap = 0;
+      sobre.classList.remove("abierto");
+      carta.classList.remove("mostrar");
+      carta.innerHTML = "";
+    }
+  </script>
+
+</body>
+</html>
